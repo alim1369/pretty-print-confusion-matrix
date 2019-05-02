@@ -71,8 +71,8 @@ def configcell_text_and_colors(array_df, lin, col, oText, facecolors, posi, fz, 
         text_kwargs = dict(color='w', ha="center", va="center", gid='sum', fontproperties=font_prop)
         lis_txt = ['%d'%(cell_val), per_ok_s, '%.2f%%'%(per_err)]
         lis_kwa = [text_kwargs]
-        dic = text_kwargs.copy(); dic['color'] = 'g'; lis_kwa.append(dic);
-        dic = text_kwargs.copy(); dic['color'] = 'r'; lis_kwa.append(dic);
+        dic = text_kwargs.copy(); dic['color'] = 'lime'; lis_kwa.append(dic);
+        dic = text_kwargs.copy(); dic['color'] = 'salmon'; lis_kwa.append(dic);
         lis_pos = [(oText._x, oText._y-0.3), (oText._x, oText._y), (oText._x, oText._y+0.3)]
         for i in range(len(lis_txt)):
             newText = dict(x=lis_pos[i][0], y=lis_pos[i][1], text=lis_txt[i], kw=lis_kwa[i])
@@ -146,18 +146,21 @@ def pretty_plot_confusion_matrix(df_cm, annot=True, cmap="Oranges", fmt='.2f', f
         ylbl = 'Predicted'
         df_cm = df_cm.T
 
+
+
     # create "Total" column
     insert_totals(df_cm)
 
     #this is for print allways in the same window
     fig, ax1 = get_new_fig('Conf matrix default', figsize)
+    fig.patch.set_facecolor('white')
 
     #thanks for seaborn
     ax = sn.heatmap(df_cm, annot=annot, annot_kws={"size": fz}, linewidths=lw, ax=ax1,
                     cbar=cbar, cmap=cmap, linecolor='w', fmt=fmt)
 
     #set ticklabels rotation
-    ax.set_xticklabels(ax.get_xticklabels(), rotation = 45, fontsize = 10)
+    ax.set_xticklabels(ax.get_xticklabels(), rotation = -30, fontsize = 10, ha='left')
     ax.set_yticklabels(ax.get_yticklabels(), rotation = 25, fontsize = 10)
 
     # Turn off all the ticks
@@ -200,7 +203,9 @@ def pretty_plot_confusion_matrix(df_cm, annot=True, cmap="Oranges", fmt='.2f', f
     ax.set_xlabel(xlbl)
     ax.set_ylabel(ylbl)
     plt.tight_layout()  #set layout slim
+    fig = plt.gcf()
     plt.show()
+    return fig
 #
 
 def plot_confusion_matrix_from_data(y_test, predictions, columns=None, annot=True, cmap="Oranges",
