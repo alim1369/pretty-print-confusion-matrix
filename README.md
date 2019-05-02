@@ -8,9 +8,9 @@ Created on Mon Jun 25 14:17:37 2018
 This module get a pretty print confusion matrix from a np matrix or from a y_test and predition values
 
 Examples:
-![alt text](https://raw.githubusercontent.com/wcipriano/pretty-print-confusion-matrix/master/Screenshots/conf_matrix_default_1.png)
+![alt text](https://raw.githubusercontent.com/alim1369/pretty-print-confusion-matrix/master/Screenshots/conf_matrix_default_1.png)
 
-![alt text](https://raw.githubusercontent.com/wcipriano/pretty-print-confusion-matrix/master/Screenshots/conf_matrix_default_3.png)
+![alt text](https://raw.githubusercontent.com/alim1369/pretty-print-confusion-matrix/master/Screenshots/conf_matrix_default_2.png)
 
 
 
