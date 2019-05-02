@@ -37,15 +37,22 @@ def configcell_text_and_colors(array_df, lin, col, oText, facecolors, posi, fz, 
     """
     text_add = []; text_del = [];
     cell_val = array_df[lin][col]
-    tot_all = array_df[-1][-1]
+    tot_all = array_df[-1][-2]
     per = (float(cell_val) / tot_all) * 100
     curr_column = array_df[:,col]
     ccl = len(curr_column)
 
+
+
     #last line  and/or last column
-    if(col == (ccl - 1)) or (lin == (ccl - 1)):
+    if (col >= (ccl - 1)) or (lin == (ccl - 1)):
+
+        if(col == ccl):
+            per_ok=cell_val*100
+            per_err=0
         #tots and percents
-        if(cell_val != 0):
+        elif(cell_val != 0):
+
             if(col == ccl - 1) and (lin == ccl - 1):
                 tot_rig = 0
                 for i in range(array_df.shape[0] - 1):
@@ -69,7 +76,12 @@ def configcell_text_and_colors(array_df, lin, col, oText, facecolors, posi, fz, 
         #text to ADD
         font_prop = fm.FontProperties(weight='bold', size=fz)
         text_kwargs = dict(color='w', ha="center", va="center", gid='sum', fontproperties=font_prop)
-        lis_txt = ['%d'%(cell_val), per_ok_s, '%.2f%%'%(per_err)]
+        if col == lin:
+           lis_txt = ['%d'%(cell_val), per_ok_s,'Accuracy']
+        elif col == ccl:
+          lis_txt = ['',per_ok_s,'']
+        else:
+           lis_txt = ['%d'%(cell_val), per_ok_s, '%.2f%%'%(per_err)]
         lis_kwa = [text_kwargs]
         dic = text_kwargs.copy(); dic['color'] = 'lime'; lis_kwa.append(dic);
         dic = text_kwargs.copy(); dic['color'] = 'salmon'; lis_kwa.append(dic);
@@ -82,7 +94,7 @@ def configcell_text_and_colors(array_df, lin, col, oText, facecolors, posi, fz, 
 
         #set background color for sum cells (last line and last column)
         carr = [0.27, 0.30, 0.27, 1.0]
-        if(col == ccl - 1) and (lin == ccl - 1):
+        if(col >= ccl - 1) and (lin == ccl - 1):
             carr = [0.17, 0.20, 0.17, 1.0]
         facecolors[posi] = carr
 
@@ -110,18 +122,38 @@ def configcell_text_and_colors(array_df, lin, col, oText, facecolors, posi, fz, 
     return text_add, text_del
 #
 
-def insert_totals(df_cm):
+def insert_totals(df_cm,pred_val_axis):
     """ insert total column and line (the last ones) """
+    if(pred_val_axis in ('col', 'x')):
+        xlbl = 'Recall'
+        ylbl = 'Precision'
+    else:
+        xlbl = 'Precision'
+        ylbl = 'Recall'
+
     sum_col = []
     for c in df_cm.columns:
         sum_col.append( df_cm[c].sum() )
     sum_lin = []
     for item_line in df_cm.iterrows():
         sum_lin.append( item_line[1].sum() )
-    df_cm['sum_lin'] = sum_lin
+    p=[]
+    r=[]
+    f1=[]
+    for i in range(0,len(df_cm.index)):
+        _p=df_cm.iat[i,i]/sum_col[i]
+        _q=df_cm.iat[i,i]/sum_lin[i]
+        _f1=2*(_p*_q)/(_p+_q)
+        f1.append(_f1)
+
+    df_cm[xlbl] = sum_lin
+    df_cm['F1-Score'] = f1
+
     sum_col.append(np.sum(sum_lin))
-    df_cm.loc['sum_col'] = sum_col
-    #print ('\ndf_cm:\n', df_cm, '\n\b\n')
+    sum_col.append(np.average(f1))
+    df_cm.loc[ylbl] = sum_col
+
+#    print ('\ndf_cm:\n', df_cm, '\n\b\n')
 #
 
 def pretty_plot_confusion_matrix(df_cm, annot=True, cmap="Oranges", fmt='.2f', fz=11,
@@ -149,7 +181,7 @@ def pretty_plot_confusion_matrix(df_cm, annot=True, cmap="Oranges", fmt='.2f', f
 
 
     # create "Total" column
-    insert_totals(df_cm)
+    insert_totals(df_cm,pred_val_axis)
 
     #this is for print allways in the same window
     fig, ax1 = get_new_fig('Conf matrix default', figsize)
@@ -290,7 +322,7 @@ if(__name__ == '__main__'):
     print('__main__')
     print('_test_cm: test function with confusion matrix done\nand pause')
     _test_cm()
-    plt.pause(5)
+#    plt.pause(5)
     print('_test_data_class: test function with y_test (actual values) and predictions (predic)')
     _test_data_class()
 
